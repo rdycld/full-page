@@ -14,7 +14,7 @@ for (const wrapper of wrappers) {
   if (!wrapper.children.length) continue;
 
   Array.from(wrapper.children).forEach((child, i) => {
-    if (!child.classList.contains("slice")) return;
+    if(!child.classList.contains('slice')) return;
 
     if (i === 0) {
       child.classList.add("first");
@@ -25,7 +25,6 @@ for (const wrapper of wrappers) {
     }
 
     const styles = child.style;
-
     styles.position = "absolute";
     styles.height = "100vh";
     styles.width = "100%";
@@ -50,25 +49,15 @@ function onWheel(e) {
   isScrolling = true;
 
   const direction = e.wheelDeltaY < 0;
+  const target = e.target.closest('.slice');
 
-  let target = e.target;
-  let sliceNotFound = false;
-
-  while (!Array.from(target.classList).includes("slice")) {
-    if (target.nodeNAME === "BODY") {
-      sliceNotFound = true;
-      return;
-    }
-    target = target.parentElement;
-  }
-
-  if (sliceNotFound) {
+  if (!target) {
     clean();
     return;
   }
 
-  const isFirst = Array.from(target.classList).includes("first");
-  const isLast = Array.from(target.classList).includes("last");
+  const isFirst = target.classList.contains("first");
+  const isLast = target.classList.contains("last");
 
   if ((direction && isLast) || (!direction && isFirst)) {
     clean();
@@ -95,7 +84,7 @@ function onWheel(e) {
 function getVH(val) {
   assert(val);
 
-  if (val.slice(-2) !== "vh") {
+  if (!val.endsWith("vh")) {
     return undefined;
   }
 
