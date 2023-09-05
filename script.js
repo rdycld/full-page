@@ -41,6 +41,7 @@ function onWheel(e) {
   } else if (!direction && currentPane > 0) {
     currentPane -= 1;
   }else {
+    onTransitionend();
     return;
   }
 
