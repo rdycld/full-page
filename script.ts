@@ -6,8 +6,9 @@ let panes = 0;
 const body = document.querySelector('body');
 body.style.overflow = 'hidden';
 
-const wrapper = document.querySelector(".wrapper");
+const wrapper = document.querySelector<HTMLElement>(".wrapper");
 panes = wrapper.children.length
+
 
 wrapper.style.transition = `all ${scrollDuration}ms`;
 
