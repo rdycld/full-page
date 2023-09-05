@@ -1,98 +1,52 @@
 let scrollDuration = 1000;
+let currentPane = 0;
+let panes = 0;
 
-const wrappers = document.querySelectorAll(".wrapper");
 
-for (const wrapper of wrappers) {
-  const styles = wrapper.style;
+const body = document.querySelector('body');
+body.style.overflow = 'hidden';
 
-  styles.position = "relative";
-  styles.height = "100vh";
-  styles.overflow = "hidden";
+const wrapper = document.querySelector(".wrapper");
+panes = wrapper.children.length
 
-  wrapper.addEventListener("wheel", onWheel);
+wrapper.style.transition = `all ${scrollDuration}ms`;
 
-  if (!wrapper.children.length) continue;
+wrapper.addEventListener("wheel", onWheel);
+wrapper.addEventListener("transitionend", onTransitionend);
 
-  Array.from(wrapper.children).forEach((child, i) => {
-    if(!child.classList.contains('slice')) return;
+Array.from(wrapper.children).forEach((child) => {
+  if(!child.classList.contains('slice')) return;
 
-    if (i === 0) {
-      child.classList.add("first");
-    }
-
-    if (i === wrapper.children.length - 1) {
-      child.classList.add("last");
-    }
-
-    const styles = child.style;
-    styles.position = "absolute";
-    styles.height = "100vh";
-    styles.width = "100%";
-    styles.border = "1px solid red";
-    styles.transition = `all ${scrollDuration}ms`;
-    styles.top = `${i}00vh`;
-    styles.fontSize = "80px";
-  });
-}
+  const style = child.style;
+  style.height = "100vh";
+  style.width = "100%";
+  style.border = "1px solid red";
+});
 
 window.onunload = function () {
-  for (const wrapper of wrapper) {
     wrapper.removeEventListener("wheel", onWheel);
-  }
+    wrapper.removeEventListener("transitionend", onTransitionend);
 };
 
-let isScrolling = false;
+let isTransforming = false
+
 function onWheel(e) {
-  if (isScrolling) {
-    return;
-  }
-  isScrolling = true;
+  if(isTransforming) return;
+  isTransforming = true;
 
   const direction = e.wheelDeltaY < 0;
-  const target = e.target.closest('.slice');
 
-  if (!target) {
-    clean();
+  if(direction && currentPane + 1 < panes){
+    currentPane += 1;
+  } else if (!direction && currentPane > 0) {
+    currentPane -= 1;
+  }else {
     return;
   }
 
-  const isFirst = target.classList.contains("first");
-  const isLast = target.classList.contains("last");
-
-  if ((direction && isLast) || (!direction && isFirst)) {
-    clean();
-    return;
-  }
-
-  const parent = target.parentElement;
-
-  for (const child of parent.children) {
-    const childTop = getVH(child.style.top);
-
-    child.style.top = `${childTop + (direction ? -100 : 100)}vh`;
-  }
-
-  setTimeout(() => {
-    clean();
-  }, scrollDuration);
-
-  function clean() {
-    isScrolling = false;
-  }
+  wrapper.style.transform = `translateY(${-100 * currentPane}vh)`
 }
 
-function getVH(val) {
-  assert(val);
-
-  if (!val.endsWith("vh")) {
-    return undefined;
-  }
-
-  return parseInt(val.substring(0, val.length - 2));
-}
-
-function assert(val) {
-  if (!val) {
-    throw new Error("expected value, got: " + val);
-  }
+function onTransitionend(){
+  isTransforming = false;
 }
