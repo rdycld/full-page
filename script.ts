@@ -7,8 +7,7 @@ const body = document.querySelector('body');
 body.style.overflow = 'hidden';
 
 const wrapper = document.querySelector<HTMLElement>(".wrapper");
-panes = wrapper.children.length
-
+panes = wrapper.children.length;
 
 wrapper.style.transition = `all ${scrollDuration}ms`;
 
@@ -16,6 +15,7 @@ wrapper.addEventListener("wheel", onWheel);
 wrapper.addEventListener("transitionend", onTransitionend);
 
 Array.from(wrapper.children).forEach((child) => {
+  if(!(child instanceof HTMLElement))return;
   if(!child.classList.contains('slice')) return;
 
   const style = child.style;
@@ -31,17 +31,17 @@ window.onunload = function () {
 
 let isTransforming = false
 
-function onWheel(e) {
-  if(isTransforming) return;
+function onWheel(e: WheelEvent) {
+
+  if(isTransforming || Math.abs(e.deltaY) < 15) return;
   isTransforming = true;
 
-  const direction = e.wheelDeltaY < 0;
-
+  const direction = e.deltaY > 0;
   if(direction && currentPane + 1 < panes){
     currentPane += 1;
   } else if (!direction && currentPane > 0) {
     currentPane -= 1;
-  }else {
+  } else {
     onTransitionend();
     return;
   }
